@@ -1,0 +1,537 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html style="height:100%;">
+<head>
+<script type="text/javascript">
+var global_timer = {
+    start: window.performance.timing.fetchStart,
+    times: []
+}
+function RestartTimer()
+{
+    global_timer.times = [];
+    global_timer.start = Date.now();
+}
+function MarkTime(label){
+    global_timer.times.push({label:label, time: Date.now()});
+}
+MarkTime("Timer init");
+</script>
+<link href="css/font-awesome.min.css" rel="stylesheet" />
+<style>
+html, body
+{
+    margin:0;
+    padding:0;
+    width: 100%;
+    height: 100%;
+    font-size: 13.333333px;
+    font-family: "Segoe UI Semibold";
+}
+#titlebox img{
+    padding-bottom: 2px;
+    padding-bottom: 2px;
+}
+select#dropdownselect{
+    padding-top:5px;
+    padding-bottom:5px;
+    padding-left:10px;
+    border-width: 0;
+    font-family: "Segoe UI Semibold";
+    height: 100%;
+}
+select#dropdownselect option{
+    line-height:45px;
+    padding-top:45px;
+    margin-bottom:45px;
+}
+
+select#dropdownselect:hover{
+    border-color: #009ddc;
+}
+
+#vertcontainer
+{
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+#overlay
+{
+    position:fixed;
+    top: 42px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+}
+.flexy
+{
+    display: flex;
+}
+#overlay .notshown, #overlay.notshown
+{
+    display: none;
+}
+
+.beingdragged
+{
+   color: #333; 
+}
+
+.lightcolored
+{
+    border-color: #a6a6a6;
+    color: #a6a6a6;
+}
+
+#overlay .darkcolored,#overlay.darkcolored
+{
+    border-color: #333;
+    color: #333;
+}
+
+#centerbox
+{
+    border-width: 1px;
+    border-style: solid;
+    width: 400px;
+    height: 270px;
+    margin-bottom: 43px;
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 5px;
+    background-color: #e5e5e5;
+    box-shadow: 1px 1px 4px #999;
+}
+.bigicon
+{
+    font-size: 80px;
+}
+#titlebox
+{
+    height: 90%;
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+}
+#uploadbutton
+{
+    font-size: 1.1em;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding-right:10px;
+    padding-left:10px;
+}
+#uploadbutton:hover{
+    cursor:pointer;
+    background-color: #009ddc;
+}
+#fileinput {
+    visibility: hidden;
+    width:0;
+    height:0;
+    margin:0;
+    padding:0;
+    display: inline-block;
+}
+
+
+#dropdown
+{
+    height: 100%;
+    display:inline-block;
+    padding-left:0px;
+    padding-right:10px;
+}
+#topbar
+{
+    height: 42px;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 0px 4px #999;
+    border-bottom: 1px solid #333;
+}
+#viewer
+{
+    height:90%;
+    width: 100%;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+#shadowback
+{
+    height:3px;
+    width: 100%;
+    background-color: #eee;
+}
+.largeuiblurb
+{
+    font-size: 33px;
+    width: 50%;
+    display: inline-block;
+    text-align: center;
+}
+.row{
+    width:100%;
+    height:100%;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.zerosize{
+    visibility: hidden;
+    width:0;
+    height:0;
+    margin:0;
+    padding:0;
+    display: inline-block;
+}
+.vcenter{
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+}
+.pageimage{
+    display: block;
+    max-height: 95%;
+    max-width: 95%;
+    margin: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: cover;
+    background-size:contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow: 0px 0px 2px #999;
+    flex: 1;
+}
+#timeoverlay{
+    position: fixed;
+    left: 10px;
+    top: 50px;
+    font-size: 1.1em;
+    color: #1e90ff;
+    text-shadow: 1px 1px 1px #FFF, -1px -1px 1px #FFF, 1px -1px 1px #FFF, -1px 1px 1px #FFF;
+}
+.progress.active.progress-success .bar{
+    -webkit-animation: progress-bar-stripes 0.5s linear infinite !important;
+    -moz-animation: progress-bar-stripes 0.5s linear infinite !important;
+    -ms-animation: progress-bar-stripes 0.5s linear infinite !important;
+    -o-animation: progress-bar-stripes 0.5s linear infinite !important;
+    animation: progress-bar-stripes 0.5s linear infinite !important;
+}
+
+</style>
+<script src="WebViewer/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="WebViewer/lib/WebViewer.js"></script>
+<script type="text/javascript">
+$(function() {
+var g_id_map = {};
+var g_last_id = 1;
+var g_uploads = {};
+var g_doc_name_obj_map = {};
+var g_recent_list = [];
+var g_max_recent_list = 10;
+var g_file_picker_armed = false;
+
+function PrintTimes(){
+    var str_array = [];
+    var first_time = global_timer.start;
+    var dif = 0;
+    var last = 0;
+    for (var i = 0; i < global_timer.times.length; i++) {
+        dif = global_timer.times[i].time - first_time;
+        
+        str_array.push('<span>');
+        str_array.push(global_timer.times[i].label);
+        str_array.push(": ");
+        str_array.push(''+ dif);
+        str_array.push("ms (+" + (dif - last));
+        str_array.push(')</span><br>');
+        last = dif;
+    }
+    global_timer.times = [];
+    document.getElementById("timeoverlay").innerHTML = str_array.join('');
+}
+
+function GetQueryVariable(a) {
+    var b = window.location.search.substring(1);
+    var c = b.split("&");
+    for (var d = 0; d < c.length; d++) {
+        var e = c[d].split("=");
+        if (e[0] == a) {
+            return e[1];
+        }
+    }
+    return null;
+}
+
+function DoLog(thing)
+{
+    console.log(thing);
+}
+
+
+
+function AddToRecentList(doc_name)
+{
+    if(g_recent_list.length > 0)
+    {
+        if(g_recent_list[g_recent_list.length -1] == doc_name)
+        {
+            return false;
+        }
+        else if(g_recent_list[g_recent_list.length -1] === null)
+        {
+            g_recent_list.pop();
+        }
+    }
+    var element = document.getElementById("dropdownselect");
+    element.onchange = null;
+    for (var i = 0; i < g_recent_list.length; ++i) {
+        if(g_recent_list[i] == doc_name)
+        {
+            g_recent_list.splice(i, 1);
+        } 
+    }
+    if(g_recent_list.length === g_max_recent_list)
+    {
+        g_recent_list.shift();
+    }
+
+    g_recent_list.push(doc_name);
+    var string_list = []
+    for (i = g_recent_list.length - 1; i >= 0; i--) {
+        string_list.push('<option style="font-size 1.1em;" value="');
+        string_list.push(g_recent_list[i] ? g_recent_list[i] : "nothing");
+        string_list.push('">');
+        if(g_recent_list[i] != null)
+        {
+            string_list.push(g_recent_list[i]);
+        }
+        else
+        {
+            string_list.push("No Document Loaded");
+        }
+        string_list.push('</option>')
+    }
+    element.innerHTML = string_list.join('');
+    element.onchange = OnRecentListSelect;
+    return true;
+}
+
+function OnRecentListSelect(evt)
+{
+    var name = evt.currentTarget.value;
+    if(!(name in g_doc_name_obj_map))
+    {
+        console.error("Can't find " + name + " in document map");
+    }
+    RestartTimer();
+    MarkTime("Dropdown select");
+    OpenDoc(g_doc_name_obj_map[name]);
+}
+
+function DocID(docURL)
+{
+    var did;
+    if(docURL)
+    {
+        did = g_last_id + 1;
+        if(docURL in g_id_map)
+        {
+            did = g_id_map[docURL];
+        }
+        else
+        {
+            g_id_map[docURL] = did;
+            g_last_id = did;
+        }
+    }
+    return did;
+}
+
+function SetProgress(fraction, percent_text)
+{
+    document.getElementById("progresstext").innerHTML = "Uploading: " + percent_text;
+}
+
+var fileinput = document.getElementById("fileinput");
+
+fileinput.onchange = function(e, force) {
+    RestartTimer();
+    var file = e.target.files[0];
+    if(file.name in g_doc_name_obj_map)
+    {
+        OpenDoc(g_doc_name_obj_map[file.name]);
+        return;
+    }
+    MarkTime("File selected");
+    document.getElementById("progresstext").innerHTML = "Uploading...";
+    $("#droptarget").addClass("notshown");
+    $("#overlay,#uploadprogress").removeClass("notshown");
+    var form = new FormData();
+    form.append("file", file);
+    DoLog("File selected\n");
+    $.ajax({
+        type: "POST",
+        url: "Upload.jsp",
+        contentType: false, // results in multipart/form-data, with the correct boundary data settings
+        data: form,
+        processData: false,
+        dataType: 'json',
+        success: function (data) {
+            MarkTime("Upload complete");
+            OpenDoc(data);
+        },
+        error: function(e){
+            DoLog("Upload error!\n");
+        },
+        xhr: function(){
+            var xhr = $.ajaxSettings.xhr() ;
+            xhr.upload.onprogress = function(evt) {
+                if (evt.total === 0) {
+                    return;
+                }
+                var fraction = evt.loaded / evt.total;
+                var percent_text = parseInt(fraction*100) + "." + parseInt(fraction * 0.1) % 10 + "%"
+                SetProgress(fraction, percent_text);
+
+                DoLog("Upload progress: " + evt.loaded + " / "
+                        + evt.total + " (" + percent_text + ")\n");
+            };
+            // set the onload event handler
+            xhr.upload.onload = function(){
+            };
+            return xhr;
+        }
+    });
+};
+
+$("#uploadbutton").click(function(){
+   
+    $('#fileinput').click();
+});
+
+function NullFunc(){}
+function PushState(doc_obj)
+{
+    history.pushState(doc_obj, doc_obj.name, "?doc=" +  encodeURIComponent(doc_obj.name));
+}
+
+var g_state_pusher = PushState;
+
+function OpenDoc(doc_obj)
+{
+    if(!doc_obj)
+    {
+        if(window.document.wvCloseDoc)
+        {
+            window.document.wvCloseDoc();
+            AddToRecentList(null);
+            $("#overlay,#droptarget").removeClass("notshown");
+        }
+        return;
+    }
+    if(!doc_obj.name || !AddToRecentList(doc_obj.name) )
+    {
+        return;
+    }
+    setTimeout(function(){
+        $("#overlay,#uploadprogress").addClass("notshown");
+    }, 1000)
+    
+    g_doc_name_obj_map[doc_obj.name] = doc_obj;
+    g_state_pusher(doc_obj);
+    var options = {
+      documentId: DocID(doc_obj.name),
+      filename: doc_obj.name
+    };
+    //72da9f12-179e-44a5-89f3-ce0cb0471a6b.jpeg
+    //document.getElementById("viewer").innerHTML = '<div class="pageimage" style="background-image: url(\'../data/DirectImage/72da9f12-179e-44a5-89f3-ce0cb0471a6b.jpeg \');">'
+    var element = document.getElementById("viewer");
+    var rando =  (Math.random()*1000000)|0;
+    element.innerHTML = '<img id="theimage" class="pageimage" src="DirectImage.jsp?file='+ doc_obj.name +'&n='+rando+'">'
+    //element.innerHTML = '<div id="theimage" class="pageimage" style="background-image: url(\'DirectImage.jsp?file='+ doc_obj.name +'\');">'
+    MarkTime("Making render request");
+    $('#theimage').on('load', function(){
+        MarkTime("Recieved image");
+        PrintTimes();
+    });
+}
+
+
+function InitWV()
+{
+    var initial = GetQueryVariable("doc");
+    if(initial)
+    {
+        OpenDoc({name:decodeURIComponent(initial)});
+    }
+}
+
+window.onpopstate = function(event){
+
+    g_state_pusher = NullFunc;
+    OpenDoc(event.state);
+    g_state_pusher = PushState;
+    
+}
+
+MarkTime("Page Loaded");
+InitWV();
+
+});
+</script>
+</head>
+<body style="width:100%;height:100%;margin:0px;padding:0px;overflow:hidden">
+<div id="vertcontainer">
+    
+    <div id="topbar">
+        <div id="dropdown">
+            <select id="dropdownselect">
+                <option class="inneritem" value="nothing">No Document Loaded</option>
+            </select>
+        </div>
+        <div id="titlebox"><span class="vcenter">&ensp;Uncached render test&ensp;</span> </div>
+        <div id="uploadbutton"><i class="fa fa-upload"></i><span class="vcenter">&ensp;Open Document</span></div>
+    </div>
+    <div id="viewer"></div>
+    <div class="zerosize"><input type="file" id="fileinput" /></div>
+</div>
+<div id="overlay" class="flexy lightcolored notshown">
+    <div id="centerbox" class="flexy">
+        <div id="uploadprogress" class="notshown row flexy darkcolored">
+            <i class="fa fa-download bigicon" id="progressicon"></i>
+            <div class="largeuiblurb"><span id="progresstext">Uploading...</span></div>
+        </div>
+        <div id="droptarget" class="row flexy">
+            <i class="fa fa-arrow-circle-o-down bigicon"></i>
+            <div class="largeuiblurb"><span>drag &amp; drop to view files</span><br><span style="font-size: 10px">(actually don't -- this doesn't work yet)</span></div>
+        </div>
+    </div>
+</div>
+<div id="timeoverlay">
+</div>
+</body>
+
+</html>

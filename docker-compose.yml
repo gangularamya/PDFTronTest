@@ -1,0 +1,56 @@
+version: "3.0"
+services:
+    reverseproxy:
+        build:
+            context: .
+            dockerfile: nginx/nginx_Dockerfile
+            args:
+                # Sets a url prefix for calls to the docker container
+                # Leave blank if you wish to just use the root path '/'
+                URL_PREFIX: 
+                # the name of your SSL certificate located in the tomcat/conf directory
+                TOMCAT_SSL_CERT: cert.crt
+                # the name of your SSL key located in the tomcat/conf directory
+                TOMCAT_SSL_KEY: nopasskey.pem
+        container_name: NGINX
+        ports:
+            # Sets the port to bind the internal 8090 port to. Follows the pattern
+            # external:internal (80:8090). Internal port must either be 8090 or 8443.
+            - 8091:8091
+            - 8444:8444
+        restart: always
+    pdfd-tomcat:
+        build:
+            context: .
+            # Everything in the args section is customizes the docker image, ensure you put
+            # all 'true' and 'false' variables inside quotes.
+            args:
+                # if true, includes the WebViewer demo at /demo?s
+                INCLUDE_DEMO: 'true'
+                # PDFNet license key
+                PDFNET_KEY: 
+                # if true, includes LibreOffice conversion support
+                LIBRE_SUPPORT: 'true'
+                # if true, includes HTML conversion support
+                HTML_SUPPORT: 'true'
+                # the name of your SSL certificate located in the tomcat/conf directory
+                TOMCAT_SSL_CERT: cert.crt
+                # the name of your SSL key located in the tomcat/conf directory
+                TOMCAT_SSL_KEY: nopasskey.pem
+                S3_BUCKET_LINK:
+                # the database type for the demo, supports sqlite and postgres
+                DB_TYPE: SQLITE
+                # Supports postgresql for now
+                # should be in the form host:port/databaseName?user=username&password=password
+                # eg. pdftron.com:5432/pdftron?user=pdftron&password=pdftron
+                EXTERNAL_DB_LINK:
+                BALANCER_COOKIE_NAME: AWSALB
+                DEBUG_MODE: 'false'
+                
+        container_name: Blackbox
+        ports:
+            # Sets the port to bind the internal 8090 port to. Follows the pattern
+            # external:internal (80:8090). Internal port must either be 8090 or 8443.
+            - 8090:8090
+            - 8443:8443
+

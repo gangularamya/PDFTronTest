@@ -1,0 +1,87 @@
+version: "3.0"
+services:
+    loadbalancer:
+        build:
+            context: .
+            dockerfile: haproxy/haproxy_Dockerfile
+            args:
+                # the name of your SSL certificate located in the tomcat/conf directory
+                TOMCAT_SSL_CERT: cert.crt
+                # the name of your SSL key located in the tomcat/conf directory
+                TOMCAT_SSL_KEY: nopasskey.pem
+        volumes:
+          - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+        container_name: HAPROXY
+        ports:
+            # Sets the port to bind the internal 8090 port to. Follows the pattern
+            # external:internal (80:8090). Internal port must either be 8090 or 8443.
+            - 8050:8050
+    pdfd-tomcat:
+        build:
+            context: .
+            # Everything in the args section is customizes the docker image, ensure you put
+            # all 'true' and 'false' variables inside quotes.
+            args:
+                # if true, includes the WebViewer demo at /demo?s
+                INCLUDE_DEMO: 'true'
+                # PDFNet license key
+                PDFNET_KEY: 
+                # if true, includes LibreOffice conversion support
+                LIBRE_SUPPORT: 'true'
+                # if true, includes HTML conversion support
+                HTML_SUPPORT: 'true'
+                # the name of your SSL certificate located in the tomcat/conf directory
+                TOMCAT_SSL_CERT: cert.crt
+                # the name of your SSL key located in the tomcat/conf directory
+                TOMCAT_SSL_KEY: nopasskey.pem
+                S3_BUCKET_LINK:
+                # the database type for the demo, supports sqlite and postgres
+                DB_TYPE: SQLITE
+                # Supports postgresql for now
+                # should be in the form host:port/databaseName?user=username&password=password
+                # eg. pdftron.com:5432/pdftron?user=pdftron&password=pdftron
+                EXTERNAL_DB_LINK:
+                BALANCER_COOKIE_NAME: HAPROXID
+                DEBUG_MODE: 'true'
+                
+        container_name: Blackbox1
+        ports:
+            # Sets the port to bind the internal 8090 port to. Follows the pattern
+            # external:internal (80:8090). Internal port must either be 8090 or 8443.
+            - 8060:8090
+            - 8440:8443
+    pdfd-tomcat2:
+        build:
+            context: .
+            # Everything in the args section is customizes the docker image, ensure you put
+            # all 'true' and 'false' variables inside quotes.
+            args:
+                # if true, includes the WebViewer demo at /demo?s
+                INCLUDE_DEMO: 'true'
+                # PDFNet license key
+                PDFNET_KEY: 
+                # if true, includes LibreOffice conversion support
+                LIBRE_SUPPORT: 'true'
+                # if true, includes HTML conversion support
+                HTML_SUPPORT: 'true'
+                # the name of your SSL certificate located in the tomcat/conf directory
+                TOMCAT_SSL_CERT: cert.crt
+                # the name of your SSL key located in the tomcat/conf directory
+                TOMCAT_SSL_KEY: nopasskey.pem
+                S3_BUCKET_LINK:
+                # the database type for the demo, supports sqlite and postgres
+                DB_TYPE: SQLITE
+                # Supports postgresql for now
+                # should be in the form host:port/databaseName?user=username&password=password
+                # eg. pdftron.com:5432/pdftron?user=pdftron&password=pdftron
+                EXTERNAL_DB_LINK:
+                BALANCER_COOKIE_NAME: HAPROXID
+                DEBUG_MODE: 'true'
+                
+        container_name: Blackbox2
+        ports:
+            # Sets the port to bind the internal 8090 port to. Follows the pattern
+            # external:internal (80:8090). Internal port must either be 8090 or 8443.
+            - 8070:8090
+            - 8441:8443
+

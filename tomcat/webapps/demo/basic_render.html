@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+<title>PDFTron Web Appliance</title>
+<script src="WebViewer/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="js/utilities.js"></script>
+<style>
+#viewer
+{
+    height:90%;
+    width: 100%;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+</style>
+</head>
+<body style="width:100%;height:100%;margin:0px;padding:0px">
+    <button id="loadbtn">Load Data</button>
+    <input id="name" value="WebViewer_User_Guide.pdf"></input>
+    <input id="pagenum" value="1"></input>
+    <div id="viewer"></div>
+    <button id="stopbtn">Stop</button>
+</body>
+<script type="text/javascript" src="js/ConnectionService.js"></script>
+<script type="text/javascript" src="js/basic_render.js"></script>
+</html>
